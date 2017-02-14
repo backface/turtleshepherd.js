@@ -1,0 +1,17 @@
+{
+  "name": "turtleshepherd.js",
+  "authors": [
+    "Michael Aschauer <m@ash.to>"
+  ],
+  "description": "embroidery tools and functions",
+  "main": "turtleShepherd.js",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
