@@ -1,6 +1,6 @@
 ## TurtleShepherd
 
-Embroidery toold and functions for JavaScript
+Embroidery tools and functions for JavaScript
 
 current features:
 * create SVG, EXP/Melco and DST/Tajima files
