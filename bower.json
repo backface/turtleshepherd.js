@@ -8,13 +8,4 @@
   "main": "turtleShepherd.js",
   "license": "MIT",
   "homepage": "https://github.com/backface/turtleshepherd.js",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests",
-    "bower.json",
-	"package.json",        
-  ]
 }
