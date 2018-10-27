@@ -672,7 +672,7 @@ TurtleShepherd.prototype.toDST = function(name="noname") {
 		expArr.push(0x1A);
 	}
 
-	writeHeader("LA:" + name.substr(0, 16); , 20, true);
+	writeHeader("LA:" + name.substr(0, 16), 20, true);
 	writeHeader("ST:" + this.steps.toString(), 11);
 	writeHeader("CO:" + this.colors.length, 7);
 	writeHeader("+X:" +  Math.round(this.maxX / this.pixels_per_millimeter) * 10, 9); // Math.round(this.getMetricWidth()*10), 9);
