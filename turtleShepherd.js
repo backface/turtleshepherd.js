@@ -940,7 +940,6 @@ TurtleShepherd.prototype.fromDST = function(file) {
       } else {
       }
       
-      console.log(x,y);
       x = last_x  + x / scale;
       y = last_y  + y / scale;
       if (last_x === null) last_x = x;
