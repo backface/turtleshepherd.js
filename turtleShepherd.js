@@ -799,25 +799,36 @@ TurtleShepherd.prototype.toDST = function(name="noname") {
 TurtleShepherd.prototype.normalize = function() {
 	hasFirst = false;
 	for (var i=0; i < this.cache.length; i++) {
-		if (this.cache.cmd == "move") {
+		if (this.cache[i].cmd == "move") {
 			if (!hasFirst) {
-				this.minX = this.cache.x;
-				this.minY = this.cache.y;
-				this.maxX = this.cache.x;
-				this.maxY = this.cache.y;
-				hastFirst = true;
+				this.minX = this.cache[i].x;
+				this.minY = this.cache[i].y;
+				this.maxX = this.cache[i].x;
+				this.maxY = this.cache[i].y;
+				hasFirst = true;
 			} else {
-				if (this.cache.x < this.minX) this.minX = this.cache.x;
-				if (this.cache.x > this.maxX) this.maxX = this.cache.x;
-				if (this.cache.y < this.minY) this.minY  = this.cache.y;
-				if (this.cache.y > this.maxY) this.maxY  = this.cache.y;
+				if (this.cache[i].x < this.minX) this.minX = this.cache[i].x;
+				if (this.cache[i].x > this.maxX) this.maxX = this.cache[i].x;
+				if (this.cache[i].y < this.minY) this.minY  = this.cache[i].y;
+				if (this.cache[i].y > this.maxY) this.maxY  = this.cache[i].y;
 			}
 		}
 	}
-    for ( i=0; i < this.cache.length; i++) {
-        this.cache.x = this.cache.x - this.minX;
-        this.cache.y = this.cache.y - this.minY;
+ 
+  this.maxY = 0;
+  this.maxX = 0;
+
+  for ( var i=0; i < this.cache.length; i++) {
+    if (this.cache[i].cmd == "move") {
+      this.cache[i].x = this.cache[i].x - this.minX;
+      this.cache[i].y = this.cache[i].y - this.minY;
+      if (this.cache[i].x > this.maxX) this.maxX = this.cache[i].x;
+      if (this.cache[i].y > this.maxY) this.maxY  = this.cache[i].y;
     }
+  }
+
+  this.minX = 0;
+  this.minY = 0;
 };
 
 
@@ -831,3 +842,116 @@ TurtleShepherd.prototype.debug_msg = function (st, clear) {
 	o = st + "<br />" + o;
 	document.getElementById("debug").innerHTML = o;
 };
+
+
+TurtleShepherd.prototype.fromDST = function(file) {
+  var pixels_per_millimeter = this.pixels_per_millimeter;
+  var scale = 10 / pixels_per_millimeter;
+
+  var flags,
+      x,
+      y,
+      b = [],
+      byteCount = file.byteLength;
+
+  var last_x = null;
+  var last_y = null;
+  
+  if (this.steps > 0) {
+    last_x = this.cache[this.steps].x
+    last_y = this.cache[this.steps].y
+  }
+          
+  file.seek(512);
+
+  while (file.tell() < (byteCount - 3)) {
+      b[0] = file.getUint8();
+      b[1] = file.getUint8();
+      b[2] = file.getUint8();
+      
+      x = 0;
+      y = 0;
+      jump = false;
+      
+      
+      if (b[0] & 0x01) {
+          x += 1;
+      }
+      if (b[0] & 0x02) {
+          x -= 1;
+      }
+      if (b[0] & 0x04) {
+          x += 9;
+      }
+      if (b[0] & 0x08) {
+          x -= 9;
+      }
+      if (b[0] & 0x80) {
+          y += 1;
+      }
+      if (b[0] & 0x40) {
+          y -= 1;
+      }
+      if (b[0] & 0x20) {
+          y += 9;
+      }
+      if (b[0] & 0x10) {
+          y -= 9;
+      }
+      if (b[1] & 0x01) {
+          x += 3;
+      }
+      if (b[1] & 0x02) {
+          x -= 3;
+      }
+      if (b[1] & 0x04) {
+          x += 27;
+      }
+      if (b[1] & 0x08) {
+          x -= 27;
+      }
+      if (b[1] & 0x80) {
+          y += 3;
+      }
+      if (b[1] & 0x40) {
+          y -= 3;
+      }
+      if (b[1] & 0x20) {
+          y += 27;
+      }
+      if (b[1] & 0x10) {
+          y -= 27;
+      }
+      if (b[2] & 0x04) {
+          x += 81;
+      }
+      if (b[2] & 0x08) {
+          x -= 81;
+      }
+      if (b[2] & 0x20) {
+          y += 81;
+      }
+      if (b[2] & 0x10) {
+          y -= 81;
+      }
+      
+      if (b[2] & 0x80) {
+        jump = true
+      } else {
+      }
+      
+      console.log(x,y);
+      x = last_x  + x / scale;
+      y = last_y  + y / scale;
+      if (last_x === null) last_x = x;
+      if (last_y === null) last_y = y;      
+      
+      this.moveTo(last_x, last_y, x, y, !jump);
+      jump = false;      
+      last_x = x;
+      last_y = y;
+  }
+  
+  this.normalize();
+  return this.cache;
+}
